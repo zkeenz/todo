@@ -10,14 +10,16 @@ const FILTERS: { label: string; value: Filter }[] = [
 ]
 
 export default function App() {
-  const { todos, filter, setFilter, add, toggle, remove, edit, clearCompleted, toggleAll, activeCount, completedCount } =
+  const { todos, filter, setFilter, add, toggle, remove, edit, setDueDate, clearCompleted, toggleAll, activeCount, completedCount } =
     useTodos()
   const [input, setInput] = useState('')
+  const [dueDate, setDueDateInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleAdd = () => {
-    add(input)
+    add(input, dueDate || undefined)
     setInput('')
+    setDueDateInput('')
     inputRef.current?.focus()
   }
 
@@ -29,21 +31,32 @@ export default function App() {
         </h1>
 
         {/* Input */}
-        <div className="flex gap-2 mb-4">
-          <input
-            ref={inputRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleAdd()}
-            placeholder="新しいTodoを入力..."
-            className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 px-4 py-2.5 text-sm outline-none focus:border-violet-400 dark:focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 transition-all"
-          />
-          <button
-            onClick={handleAdd}
-            className="bg-violet-500 hover:bg-violet-600 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition-colors shadow-sm"
-          >
-            追加
-          </button>
+        <div className="flex flex-col gap-2 mb-4">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAdd()}
+              placeholder="新しいTodoを入力..."
+              className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 px-4 py-2.5 text-sm outline-none focus:border-violet-400 dark:focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 transition-all"
+            />
+            <button
+              onClick={handleAdd}
+              className="bg-violet-500 hover:bg-violet-600 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition-colors shadow-sm"
+            >
+              追加
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 dark:text-gray-500">期限</span>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={e => setDueDateInput(e.target.value)}
+              className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 px-3 py-1.5 text-xs outline-none focus:border-violet-400 dark:focus:border-violet-500 transition-all"
+            />
+          </div>
         </div>
 
         {/* List */}
@@ -74,6 +87,7 @@ export default function App() {
                   onToggle={() => toggle(todo.id)}
                   onRemove={() => remove(todo.id)}
                   onEdit={text => edit(todo.id, text)}
+                  onSetDueDate={date => setDueDate(todo.id, date)}
                 />
               ))}
             </ul>

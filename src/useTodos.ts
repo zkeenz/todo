@@ -19,14 +19,17 @@ export function useTodos() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
   }, [todos])
 
-  const add = (text: string) => {
+  const add = (text: string, dueDate?: string) => {
     const trimmed = text.trim()
     if (!trimmed) return
     setTodos(prev => [
-      { id: crypto.randomUUID(), text: trimmed, completed: false, createdAt: Date.now() },
+      { id: crypto.randomUUID(), text: trimmed, completed: false, createdAt: Date.now(), dueDate },
       ...prev,
     ])
   }
+
+  const setDueDate = (id: string, dueDate: string | undefined) =>
+    setTodos(prev => prev.map(t => (t.id === id ? { ...t, dueDate } : t)))
 
   const toggle = (id: string) =>
     setTodos(prev => prev.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)))
@@ -60,5 +63,5 @@ export function useTodos() {
   const activeCount = todos.filter(t => !t.completed).length
   const completedCount = todos.filter(t => t.completed).length
 
-  return { todos: filtered, filter, setFilter, add, toggle, remove, edit, clearCompleted, toggleAll, activeCount, completedCount }
+  return { todos: filtered, filter, setFilter, add, toggle, remove, edit, setDueDate, clearCompleted, toggleAll, activeCount, completedCount }
 }
